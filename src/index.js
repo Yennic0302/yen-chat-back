@@ -22,8 +22,8 @@ app.use(express.urlencoded({ limit: "50mb" }));
 app.use("/api/auth", userAuthRoutes);
 app.use("/api/messages", messagesRoute);
 
-httpServer.listen(process.env.PORT || PORT);
-console.log("server on port ", process.env.PORT || PORT);
+httpServer.listen(PORT);
+console.log("server on port ", PORT);
 
 const io = new Server(httpServer, {
   cors: {
