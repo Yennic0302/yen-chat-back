@@ -7,18 +7,35 @@ const serverSockets = (io) => {
       onlineUsers.set(userId, socket.id);
     });
 
-    socket.on("send-request", (data) => {
-      const sendRequestSocket = onlineUsers.get(data.id);
-      console.log(data.id);
+    socket.on("create-chat", (data) => {
+      const sendRequestSocket = onlineUsers.get(data.chatFromUser);
+      console.log(sendRequestSocket);
       if (sendRequestSocket) {
-        socket.to(sendRequestSocket).emit("request-recieve");
+        socket.to(sendRequestSocket).emit("received-create-chat", data);
       }
     });
 
-    socket.on("accept-friend", (data) => {
+    socket.on("update-chat", (data) => {
+      const sendRequestSocket = onlineUsers.get(data.userId);
+      if (sendRequestSocket) {
+        socket.to(sendRequestSocket).emit("received-update-chat", data);
+      }
+    });
+
+    socket.on("send-request-friend", (data) => {
       const sendRequestSocket = onlineUsers.get(data.id);
       if (sendRequestSocket) {
-        socket.to(sendRequestSocket).emit("request-accept");
+        socket
+          .to(sendRequestSocket)
+          .emit("request-recieve", data.requestFriend);
+      }
+    });
+
+    socket.on("acceted-friend", (data) => {
+      console.log(data);
+      const sendRequestSocket = onlineUsers.get(data.id);
+      if (sendRequestSocket) {
+        socket.to(sendRequestSocket).emit("request-accept", data.friend);
       }
     });
 
@@ -26,7 +43,6 @@ const serverSockets = (io) => {
       const sendRequestSocket = onlineUsers.get(data.to);
       if (sendRequestSocket) {
         socket.to(sendRequestSocket).emit("msg-recieve", data);
-        socket.to(sendRequestSocket).emit("refresh-chats");
       }
     });
   });

@@ -10,107 +10,13 @@ export const addMessages = async (req, res, next) => {
       sender: from,
     });
 
-    const userFrom = await User.findOne({ _id: from });
-    const userTo = await User.findOne({ _id: to });
+    if (data)
+      return res.json({ status: true, msg: "Message added succefully" });
 
-    const validChatUserFrom = userFrom.chats.find(
-      (chat) => chat._id.toString() === to.toString()
-    );
-    const validChatUserTo = userTo.chats.find(
-      (chat) => chat._id.toString() === from.toString()
-    );
-
-    if (validChatUserFrom === undefined) {
-      const userFromUpdateChat = await User.findByIdAndUpdate(
-        { _id: from },
-        {
-          $push: {
-            chats: {
-              _id: userTo._id,
-              username: userTo.username,
-              avatarImage: userTo.avatarImage,
-              email: userTo.email,
-              lastMessage: message,
-              isRead: true,
-            },
-          },
-        }
-      );
-    } else {
-      const userFromDeleteChat = await User.findByIdAndUpdate(
-        { _id: from },
-        {
-          $pull: {
-            chats: {
-              _id: userTo._id,
-            },
-          },
-        }
-      );
-      const userFromUpdateChat = await User.findByIdAndUpdate(
-        { _id: from },
-        {
-          $push: {
-            chats: {
-              _id: userTo._id,
-              username: userTo.username,
-              avatarImage: userTo.avatarImage,
-              email: userTo.email,
-              lastMessage: message,
-              isRead: true,
-            },
-          },
-        }
-      );
-    }
-    if (validChatUserTo === undefined) {
-      const userToUpdateChat = await User.findByIdAndUpdate(
-        { _id: to },
-        {
-          $push: {
-            chats: {
-              _id: userFrom._id,
-              username: userFrom.username,
-              avatarImage: userFrom.avatarImage,
-              email: userFrom.email,
-              lastMessage: message,
-              isRead: false,
-            },
-          },
-        }
-      );
-    } else {
-      const userToDeleteChat = await User.findByIdAndUpdate(
-        { _id: to },
-        {
-          $pull: {
-            chats: {
-              _id: userFrom._id,
-            },
-          },
-        }
-      );
-
-      const userToUpdateChat = await User.findByIdAndUpdate(
-        { _id: to },
-        {
-          $push: {
-            chats: {
-              _id: userFrom._id,
-              username: userFrom.username,
-              avatarImage: userFrom.avatarImage,
-              email: userFrom.email,
-              lastMessage: message,
-              isRead: false,
-            },
-          },
-        }
-      );
-    }
-
-    if (data) return res.json({ msg: "Message added succefully" });
-
-    return res.json({ msg: "Failed to add message to the database" });
+    return res.json({
+      status: false,
+      msg: "Failed to add message to the database",
+    });
   } catch (e) {
     next(e);
   }
@@ -130,7 +36,15 @@ export const getAllMessages = async (req, res, next) => {
       };
     });
 
-    res.json(projectMessages);
+    if (messages) {
+      res.json({
+        status: true,
+        messages: projectMessages,
+        msg: "messages findedd",
+      });
+    } else {
+      res.json({ status: false, msg: "filed finding messages" });
+    }
   } catch (e) {
     next(e);
   }
