@@ -90,12 +90,12 @@ export const setAvatar = async (req, res, next) => {
         avatarImage: req.body.image,
         isAvatarImageSet: true,
       });
-    } else {
-      res.json({
-        status: false,
-        msg: "error in set image, please try again",
-      });
     }
+
+    res.json({
+      status: false,
+      msg: "error in set image, please try again",
+    });
   } catch (e) {
     next(e);
   }
